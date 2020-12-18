@@ -35,6 +35,7 @@ if __name__ == '__main__':
     hostname = config.get('default', 'hostname')
     ping_interval = config.getint('default', 'ping_interval')
     number_of_pings = config.getint('default', 'ping_attempts')
+    flush_interval = config.getint('default', 'flush_interval')
 
     file = os.getcwd() + "_log_" + get_time_date() + ".txt"
 
@@ -52,11 +53,14 @@ if __name__ == '__main__':
 
             i = 0
             while (i < number_of_pings):
-                i += 1
-                # делаем 1 пинг
-                log_str = ping(hostname)
-                # пишем в лог
-                file_handler.write(log_str)
+                i += flush_interval
+                # будем писать данные лога кусками по 10 пингов) чтобы снизить кол-во операций записи на диск
+                for write_buffer in range(flush_interval):
+                    # делаем 1 пинг
+                    log_str = ping(hostname)
+                    # пишем в лог
+                    file_handler.write(log_str)
+                
                 file_handler.flush()
 
 
